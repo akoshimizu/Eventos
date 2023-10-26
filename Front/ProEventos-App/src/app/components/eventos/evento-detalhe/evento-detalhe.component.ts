@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+
+import { BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
+
 import { Evento } from '@app/models/Evento';
 import { EventoService } from '@app/services/evento.service';
-import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 
 @Component({
   selector: 'app-evento-detalhe',
@@ -14,6 +18,7 @@ export class EventoDetalheComponent implements OnInit {
 
   evento = {} as Evento;
   form!: FormGroup;
+  estadoSalvar = 'post';
 
   get f(): any{
     return this.form.controls;
@@ -31,7 +36,10 @@ export class EventoDetalheComponent implements OnInit {
   constructor(private fb: FormBuilder,
               private localeService: BsLocaleService,
               private router: ActivatedRoute,
-              private eventoService: EventoService) {
+              private eventoService: EventoService,
+              private spinner: NgxSpinnerService,
+              private toastr: ToastrService) {
+
     this.localeService.use('pt-br');
   }
 
@@ -39,15 +47,21 @@ export class EventoDetalheComponent implements OnInit {
     const eventoIdParam = this.router.snapshot.paramMap.get('id');
 
     if(eventoIdParam != null) {
+      this.spinner.show();
+
+      this.estadoSalvar = 'put';
+
       this.eventoService.getEventoById(+eventoIdParam).subscribe(
         (evento: Evento) => {
           this.evento = {...evento};
           this.form.patchValue(this.evento);
         },
         (error: any) => {
+          this.spinner.hide();
+          this.toastr.error('Erro ao tentar carregar evento');
           console.log(error);
         },
-        () => {}
+        () => this.spinner.hide()
       );
     }
   }
@@ -75,6 +89,28 @@ export class EventoDetalheComponent implements OnInit {
 
   public cssValidator(campoForm: FormControl): any {
     return {'is-invalid': campoForm.errors && campoForm.touched};
+  }
+
+  public salvarAlteracao(): void {
+    this.spinner.show();
+    if(this.form.valid) {
+
+       this.evento = (this.estadoSalvar == 'post')
+          ? {...this.form.value}
+          : this.evento = {id: this.evento.id, ...this.form.value} //spread operator, puxa todos os campos do formulário preenchido.
+
+        this.eventoService[this.estadoSalvar](this.evento).subscribe(
+          () => this.toastr.success('Evento salvo com sucesso', 'Sucesso'),
+          (error: any) => {
+            console.error(error);
+            this.spinner.hide();
+            this.toastr.error('Erro ao adicionar novo evento', 'Erro!');
+          },
+          () => this.spinner.hide()
+        );
+      }
+
+
   }
 
 }

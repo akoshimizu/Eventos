@@ -34,8 +34,8 @@ namespace ProEventos.Application.Dtos
         
         [EmailAddress(ErrorMessage = "Insira um {0} válido.")]
         public string Email { get; set; }
-        public IEnumerable<LoteDto> Lotes { get; set; }
-        public IEnumerable<RedeSocialDto> RedeSociais { get; set; }
-        public IEnumerable<PalestranteDto> PalestrantesEventos { get; set; }
+        public IEnumerable<LoteDto>? Lotes { get; set; }
+        public IEnumerable<RedeSocialDto>? RedeSociais { get; set; }
+        public IEnumerable<PalestranteDto>? PalestrantesEventos { get; set; }
     }
 }

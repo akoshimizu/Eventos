@@ -67,19 +67,19 @@ namespace ProEventos.Application.Services
         }
 
         public async Task<bool> DeleteEventos(int eventoId)
-        {return false;
-            // try
-            // {
-            //     var evento = await _eventoRepository.GetEventoByIdAsync(eventoId, false);
-            //     if(evento == null) throw new Exception("Evento para deletar não foi encontrado");
+        {
+            try
+            {
+                var evento = await _eventoRepository.GetEventoByIdAsync(eventoId, false);
+                if(evento == null) throw new Exception("Evento para deletar não foi encontrado");
 
-            //     _geralRepository.Delete<EventoDto>(evento);
-            //     return await _geralRepository.SaveChangesAsync();
-            // }
-            // catch (Exception ex)
-            // {
-            //     throw new Exception(ex.Message);
-            // }
+                _geralRepository.Delete(evento);
+                return await _geralRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<EventoDto[]> GetAllEventosAsync(bool incluirPalestrates = false)
