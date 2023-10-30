@@ -20,9 +20,13 @@ builder.Services.AddControllers()
             
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddScoped<IEventoService, EventoService>();
 builder.Services.AddScoped<IGeralRepository, GeralRepository>();
+
+builder.Services.AddScoped<IEventoService, EventoService>();
+builder.Services.AddScoped<ILoteService, LoteService>();
+
 builder.Services.AddScoped<IEventoRepository, EventosRepository>();
+builder.Services.AddScoped<ILoteRepository, LoteRepository>();
 
 builder.Services.AddCors();
 
