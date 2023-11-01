@@ -3,10 +3,11 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { Evento } from '../models/Evento';
+import { environment } from '@enviroments/environment';
 
 @Injectable()
 export class EventoService {
-  baseUrl = 'https://localhost:7151/api/eventos'
+  baseUrl = environment.apiURL +  'api/eventos';
 
   constructor(private http: HttpClient) { }
 
@@ -43,6 +44,16 @@ export class EventoService {
   public deleteEvento(id: number): Observable<any> {
     return this.http
     .delete(`${this.baseUrl}/${id}`)
+    .pipe(take(1));
+  }
+
+  postUpload(eventId: number, file: File): Observable<Evento> {
+    const fileToUpload = file[0] as File;
+    const formData = new FormData();
+    formData.append('file', fileToUpload);
+
+    return this.http
+    .post<Evento>(`${this.baseUrl}/upload-image/${eventId}`, formData)
     .pipe(take(1));
   }
 
